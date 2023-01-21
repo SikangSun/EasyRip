@@ -1,11 +1,31 @@
 import subprocess
-
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 from yt_dlp import YoutubeDL
 import json
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware import Middleware
 
-app = FastAPI()
+
+# CORS STUFF
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173"
+]
+
+middleware = [
+    Middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"]
+    )
+]
+
+app = FastAPI(middleware=middleware)
 
 
 async def fake_video_streamer():
