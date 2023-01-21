@@ -20,5 +20,9 @@
 		"tailwindcss": "^3.2.4",
 		"vite": "^4.0.0"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"axios": "^1.2.3",
+		"svelte-french-toast": "^1.0.3"
+	}
 }
