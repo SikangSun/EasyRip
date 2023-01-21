@@ -1,7 +1,10 @@
 <script>
     import toast, { Toaster } from 'svelte-french-toast';
-    import { onMount } from 'svelte'
+    import { onMount } from 'svelte';
+    import axios from 'axios';
+
     let url = ""
+    let server = "http://127.0.0.1:8000"
     let videoFound = true;
     onMount(() => {
         toast.success('Successfully toasted!')
@@ -14,8 +17,12 @@
     const downloadAudio = () => {
 
     }
-    const searchVideo = () => {
-
+    const searchVideo = async (url) => {
+        const i = url.indexOf("?v=");
+        const v = url.substr(i+3);
+        console.log(v);
+        const res = await axios.get(`${server}/get_metadata?v=${v}`);
+        console.log(res.data)
     }
 </script>
 
@@ -44,7 +51,7 @@
                             type="submit" value="Search"/>
         </form>
         {#if videoFound == true}
-        <div>
+        <div class="h-2/3 bg-slate-500 overflow-hidden">
             adsf
         </div>
         {/if}
