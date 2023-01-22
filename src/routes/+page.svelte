@@ -9,7 +9,7 @@
     
 
     let url = "";
-        $: videoID = url.substring(url.indexOf("?v=") + 3, url.indexOf("&") ? url.indexOf("&") : url.length);
+        $: videoID = url.substring(url.indexOf("?v=") + 3, url.indexOf("&") > 0 ? url.indexOf("&") : url.length);
     let md = {};
     let videoFound = false;
     let tn = "";
@@ -40,7 +40,7 @@
         console.log(isPageLoaded)
         const i = url.indexOf("?v=");
         const v = url.substr(i+3);
-        console.log(v);
+        console.log(url.indexOf("&") ? url.indexOf("&") : url.length);
         const res = await axios.get(`${server}get_metadata?v=${v}`);
         console.log(res)
  
@@ -139,10 +139,10 @@
             
                 <div>
                     <label>
-                        <input type="checkbox"on:change={() => timestamp = !timestamp}/>
+                        <input disabled type="checkbox"on:change={() => timestamp = !timestamp}/>
                         Timestamp
                     </label>
-                    <input class="outline rounded-sm w-5" type="number" value="00">
+                    <!-- <input class="outline rounded-sm w-5" type="number" value="00"> -->
                 </div>
 
             </div>
@@ -170,7 +170,7 @@
             
             <!-- download audio -->
             <div class="relative flex flex-col justify-start mr-2">
-                <a href={`${server}get_video?v=${videoID}&f=${defaultAudioID}`} class="btn">
+                <a href={`${server}get_video?v=${videoID}&f=${defaultAudioID}${filename ? `&n=${filename}` : ""}`} class="btn">
                     <div class="inline-block">
                         Download Audio
                         <button on:click="{() => showAudioList = !showAudioList}" class="btn p-1 pl-2 pr-2">{#if showAudioList == true} ↑ {:else} ↓ {/if}</button>
@@ -180,7 +180,7 @@
                     <div  transition:fly="{{x:-200, duration: 500}}" class="absolute w-fit max-w-[300px] h-fit top-12 outline outline-gray-500 bg-slate-50 rounded-sm pr-0">
                         {#each audioList as audio}
                             <div class="text-xs hover:bg-slate-200">
-                                <a href={`${server}get_video?v=${videoID}&f=${audio.id}`}>
+                                <a href={`${server}get_video?v=${videoID}&f=${audio.id}${filename ? `&n=${filename}` : ""}`}>
                                  audio ({audio.ext}) {#if audio.filesize} ({bytes.format(audio.filesize,  {decimalPlaces: 1})}) {/if}
                                 </a>
                             </div>
@@ -195,7 +195,7 @@
 
             <!-- download video -->
             <div class="relative flex flex-col justify-start">
-                <a href={`${server}get_video?v=${videoID}&f=${defaultVideoID}`} class="btn">
+                <a href={`${server}get_video?v=${videoID}&f=${defaultVideoID}${filename ? `&n=${filename}` : ""}`} class="btn">
                     <div class="inline-block">
                         Download Video
                         <button on:click="{() => showVideoList = !showVideoList}" class="btn p-1 pl-2 pr-2"> {#if showVideoList == true} ↑ {:else} ↓ {/if}</button>
@@ -206,7 +206,7 @@
                 <div transition:fly="{{x:200, duration: 500}}" class="absolute w-fit max-w-[300px] h-fit top-12 outline outline-gray-500 bg-slate-50 rounded-sm pr-0">
                     {#each videoList as video}
                         <div  class="text-xs hover:bg-slate-200">
-                            <a href={`${server}get_video?v=${videoID}&f=${video.id}`}>
+                            <a href={`${server}get_video?v=${videoID}&f=${video.id}${filename ? `&n=${filename}` : ""}`}>
                             {video.desc}({video.ext}) {#if video.filesize} ({bytes.format(video.filesize,  {decimalPlaces: 1})}) {/if}
                             </a>
                         </div>

@@ -47,7 +47,7 @@ def video_streamer(v, f):
 
 
 @app.get("/get_video")
-async def get_video(v, f, n):
+async def get_video(v, f, n=None):
     url = 'https://www.youtube.com/watch?v=' + v
 
     ydl_opts = {}
