@@ -6,9 +6,10 @@
     import bytes from "bytes";
 
     let url = "";
-        $: video = url.substring(url.indexOf("?v=") + 3);
+        $: videoID = url.substring(url.indexOf("?v=") + 3);
     let md = {};
     let videoFound = false;
+    let tn = "";
 
     let showVideoList = false;
     let videoList = ["1","asdfasfasdfsadf","3","4","5"];
@@ -53,12 +54,22 @@
         const v = url.substr(i+3);
         console.log(v);
         const res = await axios.get(`${server}get_metadata?v=${v}`);
-        console.log(res.data)
-        //if fails {}
+        console.log(res)
+ 
 
+        if (res.status == 200) {
         md = res.data
         videoFound = true;
-        videoList = md.formats.filter(x => x.is_video == true)
+        //care svelte array changes
+        videoList = md.formats.filter(x => x.is_video == true);
+        audioList = md.formats.filter(x => x.is_video == false);
+        tn = `https://i.ytimg.com/vi/${videoID}/mqdefault.jpg`;
+        console.log(success)
+        }
+        else {
+            //if fails {}
+        }
+      
     }
 
 </script>
@@ -83,7 +94,7 @@
             <input class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
                             focus:ring-blue-500 focus:border-blue-500 block w-10/12 p-2.5
                             " 
-                             placeholder="URL Here" type="URL" bind:value="{url}" />
+                             placeholder="URL Here" type="URL" bind:value="{url}" on:input={() => {md = {}; videoFound = false;}}/>
             <input class="btn ml-2"
                             on:click= {() => searchVideo(url)}
                             type="submit" value="Search"/>
@@ -93,11 +104,11 @@
         <!-- descriptions and options -->
         <div  transition:fade class="flex flex-col h-full items-start content-start p-2">
             <!-- thumnail and description -->
-            <div class="flex flex-row w-full h-1/2 justify-between ">
-                <div class="w-1/2 border">
-                    <img class="h-full" src={`https://i.ytimg.com/vi/${video}/mqdefault.jpg`} alt="Thumbnail">
+            <div class="flex flex-row w-full h-1/2 justify-between pt-2">
+                <div class="w-1/2">
+                    <img class="h-full rounded outline outline-4 outline-red-500" src={tn} alt="Thumbnail">
                 </div>
-                <div class="w-1/2 flex justify-start flex-col pl-2">
+                <div class="w-1/2 flex justify-start flex-col pl-4 ">
                     <div class="text-md p-1/2">
                         Author: {md.uploader}
                     </div>
@@ -168,11 +179,11 @@
                     </div>
                 </a>
                 {#if showAudioList == true}
-                    <div  transition:fly="{{x:-200, duration: 500}}" class="absolute w-fit h-fit top-12 outline outline-gray-500 bg-slate-50 rounded-sm pr-0">
+                    <div  transition:fly="{{x:-200, duration: 500}}" class="absolute w-fit max-w-[300px] h-fit top-12 outline outline-gray-500 bg-slate-50 rounded-sm pr-0">
                         {#each audioList as audio}
-                            <div class="hover:bg-slate-200">
-                                <a href="">
-                                 {audio}
+                            <div class="text-xs hover:bg-slate-200">
+                                <a href={`${server}get_video?v=${videoID}&?f=${audio.id}`}>
+                                 audio ({audio.ext})
                                 </a>
                             </div>
                         {/each}
@@ -194,11 +205,11 @@
                 </a>
             {#if showVideoList == true}
 
-                <div transition:fly="{{x:200, duration: 500}}" class="absolute w-fit h-fit top-12 outline outline-gray-500 bg-slate-50 rounded-sm pr-0">
+                <div transition:fly="{{x:200, duration: 500}}" class="absolute w-fit max-w-[300px] h-fit top-12 outline outline-gray-500 bg-slate-50 rounded-sm pr-0">
                     {#each videoList as video}
-                        <div  class="hover:bg-slate-200">
-                            <a href="">
-                            {video}
+                        <div  class="text-xs hover:bg-slate-200">
+                            <a href={`${server}get_video?v=${videoID}&?f=${video.id}`}>
+                            {video.desc}({video.ext})
                             </a>
                         </div>
                     {/each}

@@ -34,10 +34,10 @@ async def fake_video_streamer():
 
 def video_streamer(v, f):
     if f == 0:
-        proc = subprocess.Popen(["./yt-dlp_macos", "-o", "-", "https://www.youtube.com/watch?v=" + v],
+        proc = subprocess.Popen(["./yt-dlp", "-o", "-", "https://www.youtube.com/watch?v=" + v],
                                 stdout=subprocess.PIPE)
     else:
-        proc = subprocess.Popen(["./yt-dlp_macos", "-o", "-", "-f", str(f), "https://www.youtube.com/watch?v=" + v],
+        proc = subprocess.Popen(["./yt-dlp", "-o", "-", "-f", str(f), "https://www.youtube.com/watch?v=" + v],
                                 stdout=subprocess.PIPE)
 
     return proc.stdout
