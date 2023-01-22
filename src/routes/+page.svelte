@@ -6,19 +6,22 @@
     import bytes from "bytes";
 
     let isPageLoaded = true;
-
+    
 
     let url = "";
-        $: videoID = url.substring(url.indexOf("?v=") + 3);
+        $: videoID = url.substring(url.indexOf("?v=") + 3, url.indexOf("&") ? url.indexOf("&") : url.length);
     let md = {};
     let videoFound = false;
     let tn = "";
+ 
 
     let showVideoList = false;
     let videoList = ["1","asdfasfasdfsadf","3","4","5"];
+    let defaultVideoID = "";
 
     let showAudioList = false;
     let audioList = ["1","asdfasfasdfsadf","3","4","5"];
+    let defaultAudioID = ""
 
     let server = "http://127.0.0.1:8000/"
 
@@ -28,7 +31,7 @@
     let filename = "";
 
     onMount(() => {
-        toast.success('Successfully toasted!')
+        toast('Welcome!', {icon: '👋'})
     })
 
 
@@ -49,6 +52,8 @@
         videoList = md.formats.filter(x => x.is_video == true);
         audioList = md.formats.filter(x => x.is_video == false);
         tn = `https://i.ytimg.com/vi/${videoID}/mqdefault.jpg`;
+        defaultVideoID = videoList.filter(x => x.is_default == true)[0].id
+        defaultAudioID = audioList[audioList.length - 1].id
         console.log("success")
         }
         else {
@@ -63,7 +68,7 @@
 <!-- screen box div -->
 <div class="flex flex-col justify-center items-center
             h-screen w-screen bg-[#f7f7f7]" >
-    <div class="font-serif text-center text-2xl min-w-min w-1/2 max-w-md flex justify-center"
+    <div class="font-serif text-center text-2xl inline-block min-w-min w-1/2 max-w-1xljustify-center "
     >
         EasyRip - The Easiest Way to Rip Youtube Videos 
     </div>
@@ -165,7 +170,7 @@
             
             <!-- download audio -->
             <div class="relative flex flex-col justify-start mr-2">
-                <a href={``} class="btn">
+                <a href={`${server}get_video?v=${videoID}&f=${defaultAudioID}`} class="btn">
                     <div class="inline-block">
                         Download Audio
                         <button on:click="{() => showAudioList = !showAudioList}" class="btn p-1 pl-2 pr-2">{#if showAudioList == true} ↑ {:else} ↓ {/if}</button>
@@ -176,7 +181,7 @@
                         {#each audioList as audio}
                             <div class="text-xs hover:bg-slate-200">
                                 <a href={`${server}get_video?v=${videoID}&f=${audio.id}`}>
-                                 audio ({audio.ext})
+                                 audio ({audio.ext}) {#if audio.filesize} ({bytes.format(audio.filesize,  {decimalPlaces: 1})}) {/if}
                                 </a>
                             </div>
                         {/each}
@@ -190,7 +195,7 @@
 
             <!-- download video -->
             <div class="relative flex flex-col justify-start">
-                <a href={``} class="btn">
+                <a href={`${server}get_video?v=${videoID}&f=${defaultVideoID}`} class="btn">
                     <div class="inline-block">
                         Download Video
                         <button on:click="{() => showVideoList = !showVideoList}" class="btn p-1 pl-2 pr-2"> {#if showVideoList == true} ↑ {:else} ↓ {/if}</button>
@@ -202,7 +207,7 @@
                     {#each videoList as video}
                         <div  class="text-xs hover:bg-slate-200">
                             <a href={`${server}get_video?v=${videoID}&f=${video.id}`}>
-                            {video.desc}({video.ext})
+                            {video.desc}({video.ext}) {#if video.filesize} ({bytes.format(video.filesize,  {decimalPlaces: 1})}) {/if}
                             </a>
                         </div>
                     {/each}
