@@ -5,6 +5,9 @@
     import axios from "axios";
     import bytes from "bytes";
 
+    let isPageLoaded = true;
+
+
     let url = "";
         $: videoID = url.substring(url.indexOf("?v=") + 3);
     let md = {};
@@ -22,34 +25,16 @@
 
     let sponsor = false;
     let timestamp = false;
+    let filename = "";
+
     onMount(() => {
         toast.success('Successfully toasted!')
     })
 
-    const downloadVideo = async () => {
-        // const res = await axios.get(`${server}?v=${video}`, {responseType: 'blob'});
-        // console.log("haha")
 
-        // var binaryData = [];
-        // binaryData.push(res.data);
-        // const href = URL.createObjectURL(new Blob(binaryData, {type: "application/text"}));
-
-        // // create "a" HTML element with href to file & click
-        // const link = document.createElement('a');
-        // link.href = href;
-        // link.setAttribute('download', 'name.mp4'); //or any other extension
-        // document.body.appendChild(link);
-        // link.click();
-
-        // // clean up "a" element & remove ObjectURL
-        // document.body.removeChild(link);
-        // URL.revokeObjectURL(href);
-    }
-
-    const downloadAudio = async () => {
-      
-    }
     const searchVideo = async (url) => {
+        isPageLoaded = false;
+        console.log(isPageLoaded)
         const i = url.indexOf("?v=");
         const v = url.substr(i+3);
         console.log(v);
@@ -64,11 +49,12 @@
         videoList = md.formats.filter(x => x.is_video == true);
         audioList = md.formats.filter(x => x.is_video == false);
         tn = `https://i.ytimg.com/vi/${videoID}/mqdefault.jpg`;
-        console.log(success)
+        console.log("success")
         }
         else {
             //if fails {}
         }
+        isPageLoaded = true;
       
     }
 
@@ -82,7 +68,7 @@
         EasyRip - The Easiest Way to Rip Youtube Videos 
     </div>
     <!-- main box div -->
-    <div class="flex flex-col justify-between
+    <div class="relative flex flex-col justify-between
                 h-[400px] 
                 w-[500px]
                 outline outline-gray-500 hover:outline-4 hover:outline-black transition-all
@@ -99,10 +85,17 @@
                             on:click= {() => searchVideo(url)}
                             type="submit" value="Search"/>
         </form>
-
-        {#if videoFound == true}
+        
+        {#if !isPageLoaded}
+            <div transition:fade class="absolute right-[150px] bottom-1/4">
+                <div class="text-center">
+                <img src="/loading.svg" alt="loading...">
+                <span class="text-sm">Looking very hard!!!</span> 
+                </div>
+            </div>
+        {:else if videoFound == true}
         <!-- descriptions and options -->
-        <div  transition:fade class="flex flex-col h-full items-start content-start p-2">
+        <div  transition:fade="{{delay: 500}}" class="flex flex-col h-full items-start content-start p-2">
             <!-- thumnail and description -->
             <div class="flex flex-row w-full h-1/2 justify-between pt-2">
                 <div class="w-1/2">
@@ -153,7 +146,7 @@
             <div>
                 <label >
                     Name my downloaded file: 
-                    <input type="text" maxlength="20" placeholder="default" class="outline rounded-sm pl-1">
+                    <input type="text" bind:value={filename} maxlength="20" placeholder="default" class="outline rounded-sm pl-1">
                 </label>
             </div>
 
@@ -167,7 +160,7 @@
 
 
         <!-- download buttons -->
-        <div class="bottom-0 mb-4 w-full
+        <div  transition:fade="{{delay: 500}}"  class="bottom-0 mb-4 w-full
                     flex flex-row justify-between">
             
             <!-- download audio -->
@@ -182,7 +175,7 @@
                     <div  transition:fly="{{x:-200, duration: 500}}" class="absolute w-fit max-w-[300px] h-fit top-12 outline outline-gray-500 bg-slate-50 rounded-sm pr-0">
                         {#each audioList as audio}
                             <div class="text-xs hover:bg-slate-200">
-                                <a href={`${server}get_video?v=${videoID}&?f=${audio.id}`}>
+                                <a href={`${server}get_video?v=${videoID}&f=${audio.id}`}>
                                  audio ({audio.ext})
                                 </a>
                             </div>
@@ -208,7 +201,7 @@
                 <div transition:fly="{{x:200, duration: 500}}" class="absolute w-fit max-w-[300px] h-fit top-12 outline outline-gray-500 bg-slate-50 rounded-sm pr-0">
                     {#each videoList as video}
                         <div  class="text-xs hover:bg-slate-200">
-                            <a href={`${server}get_video?v=${videoID}&?f=${video.id}`}>
+                            <a href={`${server}get_video?v=${videoID}&f=${video.id}`}>
                             {video.desc}({video.ext})
                             </a>
                         </div>
