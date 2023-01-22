@@ -4,6 +4,14 @@
 
 @layer components {
     .btn {
-        @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 m-0
+        @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 
     }
 }
+
+@layer base {
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
