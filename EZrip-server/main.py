@@ -59,7 +59,7 @@ async def get_video_metadata(v):
 
         # ℹ️ ydl.sanitize_info makes the info json-serializable
         metadata = ydl.sanitize_info(info)
-        #print(metadata)
+        # print(metadata)
         return_json = {'formats': [], 'title': metadata['title'], 'uploader': metadata['uploader'],
                        'duration_string': metadata['duration_string'], 'like_count': metadata['like_count'],
                        'upload_date': metadata['upload_date'], 'view_count': metadata['view_count']}
@@ -69,8 +69,10 @@ async def get_video_metadata(v):
             # check if height is integer
             if isinstance(f['height'], int):
                 height = f['height']
+                is_video = True
             else:
                 height = 0
+                is_video = False
 
             format_id = f['format_id']
 
@@ -89,6 +91,6 @@ async def get_video_metadata(v):
             desc = f['format'][f['format'].index(' ', i + 1) + 1:]
             ext = f['ext']
 
-            return_json['formats'].append({'desc': desc, 'ext': ext, 'id': format_id})
+            return_json['formats'].append({'desc': desc, 'ext': ext, 'id': format_id, 'is_video': is_video})
 
         return return_json
