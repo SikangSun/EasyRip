@@ -59,7 +59,7 @@ async def get_video_metadata(v):
 
         # ℹ️ ydl.sanitize_info makes the info json-serializable
         metadata = ydl.sanitize_info(info)
-        print(metadata)
+        #print(metadata)
         return_json = {'formats': [], 'title': metadata['title'], 'uploader': metadata['uploader'],
                        'duration_string': metadata['duration_string'], 'like_count': metadata['like_count'],
                        'upload_date': metadata['upload_date'], 'view_count': metadata['view_count']}

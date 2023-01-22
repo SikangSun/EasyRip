@@ -2,11 +2,14 @@
     import toast, { Toaster } from 'svelte-french-toast';
     import {fade, fly} from "svelte/transition"
     import { onMount } from 'svelte';
-    import axios from 'axios';
+    import axios from "axios";
+    import bytes from "bytes";
 
     let url = "";
         $: video = url.substring(url.indexOf("?v=") + 3);
-    
+    let md = {};
+    let videoFound = false;
+
     let showVideoList = false;
     let videoList = ["1","asdfasfasdfsadf","3","4","5"];
 
@@ -14,7 +17,7 @@
     let audioList = ["1","asdfasfasdfsadf","3","4","5"];
 
     let server = "http://127.0.0.1:8000/"
-    let videoFound = true;
+
 
     let sponsor = false;
     let timestamp = false;
@@ -51,6 +54,11 @@
         console.log(v);
         const res = await axios.get(`${server}get_metadata?v=${v}`);
         console.log(res.data)
+        //if fails {}
+
+        md = res.data
+        videoFound = true;
+        videoList = md.formats.filter(x => x.is_video == true)
     }
 
 </script>
@@ -83,30 +91,33 @@
 
         {#if videoFound == true}
         <!-- descriptions and options -->
-        <div class="flex flex-col h-full items-start content-start p-2">
+        <div  transition:fade class="flex flex-col h-full items-start content-start p-2">
             <!-- thumnail and description -->
             <div class="flex flex-row w-full h-1/2 justify-between ">
-                <div class="w-1/2">
-                    <img class="h-full" src="https://i.ytimg.com/vi/-JSj7N4lH3s/mqdefault.jpg" alt="Thumbnail">
+                <div class="w-1/2 border">
+                    <img class="h-full" src={`https://i.ytimg.com/vi/${video}/mqdefault.jpg`} alt="Thumbnail">
                 </div>
                 <div class="w-1/2 flex justify-start flex-col pl-2">
-                    <div class="text-md p-1">
-                        Author: 
+                    <div class="text-md p-1/2">
+                        Author: {md.uploader}
                     </div>
-                    <div class="text-md p-1">
-                        Date Published:
+                    <div class="text-md p-1/2">
+                        Date Published: {md.upload_date.substring(0,4)}-{md.upload_date.substring(4,6)}-{md.upload_date.substring(6)} 
                     </div>
-                    <div class="text-md p-1">
-                        Duration:
+                    <div class="text-md p-1/2">
+                        Duration: {#if md.duration_string.indexOf(":") >= 0} {md.duration_string} minutes {:else} {md.duration_string} seconds {/if}
                     </div>
-                    <div class="text-md p-1">
-                        Likes:
+                    <div class="text-md p-1/2">
+                        Likes: {md.like_count}
+                    </div>
+                    <div class="text-md p-1/2">
+                        Views: {md.view_count}
                     </div>
                 </div>
             </div>
 
-            <div class="w-full font-bold text-2xl my-2">
-                Title: []
+            <div class="inline overflow-hidden whitespace-nowrap w-full font-bold text-2xl my-2 text-ellipsis">
+                {md.title}
             </div>
 
             <div class="w-full flex flex-row justify-between my-2">
@@ -131,7 +142,7 @@
             <div>
                 <label >
                     Name my downloaded file: 
-                    <input type="text" maxlength="15" placeholder="default" class="outline rounded-sm pl-1">
+                    <input type="text" maxlength="20" placeholder="default" class="outline rounded-sm pl-1">
                 </label>
             </div>
 
