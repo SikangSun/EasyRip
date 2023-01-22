@@ -63,7 +63,7 @@
 <!-- screen box div -->
 <div class="flex flex-col justify-center items-center
             h-screen w-screen bg-[#f7f7f7]" >
-    <div class="min-w-min w-1/2 max-w-md flex justify-center"
+    <div class="font-serif text-center text-2xl min-w-min w-1/2 max-w-md flex justify-center"
     >
         EasyRip - The Easiest Way to Rip Youtube Videos 
     </div>
