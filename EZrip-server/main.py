@@ -47,7 +47,7 @@ def video_streamer(v, f):
 
 
 @app.get("/get_video")
-async def get_video(v, f):
+async def get_video(v, f, n):
     url = 'https://www.youtube.com/watch?v=' + v
 
     ydl_opts = {}
@@ -61,7 +61,10 @@ async def get_video(v, f):
         if frm['format_id'] == f:
             ext = frm['ext']
 
-    filename = metadata['title'] + "." + ext
+    if n is None:
+        filename = metadata['title'] + "." + ext
+    else:
+        filename = n + "." + ext
     return StreamingResponse(video_streamer(v, f), media_type="application/octet-stream",
                              headers={"Content-Disposition": "filename=\"{filename}\"".format(filename=filename)})
 
