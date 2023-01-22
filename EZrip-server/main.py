@@ -1,5 +1,5 @@
 import subprocess
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.responses import StreamingResponse
 from yt_dlp import YoutubeDL
 import json
@@ -34,12 +34,12 @@ async def fake_video_streamer():
 
 def video_streamer(v, f):
     if f == 0:
-        proc = subprocess.Popen(["./yt-dlp", "-o", "-", "https://www.youtube.com/watch?v=" + v],
+        proc = subprocess.Popen(["./yt-dlp_macos", "-o", "-", "https://www.youtube.com/watch?v=" + v],
                                 stdout=subprocess.PIPE)
     else:
         print(f)
         f = f.replace(" ", "+")
-        proc = subprocess.Popen(["./yt-dlp", "-o", "-", "-f", str(f), "--ffmpeg-location", ".",
+        proc = subprocess.Popen(["./yt-dlp_macos", "-o", "-", "-f", str(f), "--ffmpeg-location", ".",
                                  "https://www.youtube.com/watch?v=" + v],
                                 stdout=subprocess.PIPE)
 
@@ -48,7 +48,22 @@ def video_streamer(v, f):
 
 @app.get("/get_video")
 async def get_video(v, f):
-    return StreamingResponse(video_streamer(v, f), media_type="application/octet-stream")
+    url = 'https://www.youtube.com/watch?v=' + v
+
+    ydl_opts = {}
+    with YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url, download=False)
+        metadata = ydl.sanitize_info(info)
+
+    ext = "mkv"
+
+    for frm in metadata['formats']:
+        if frm['format_id'] == f:
+            ext = frm['ext']
+
+    filename = metadata['title'] + "." + ext
+    return StreamingResponse(video_streamer(v, f), media_type="application/octet-stream",
+                             headers={"Content-Disposition": "filename=\"{filename}\"".format(filename=filename)})
 
 
 @app.get("/get_metadata")
@@ -93,18 +108,23 @@ async def get_video_metadata(v):
             i = f['format'].index(' ')
             desc = f['format'][f['format'].index(' ', i + 1) + 1:]
             ext = f['ext']
+            filesize = f['filesize']
 
             return_json['formats'].append(
                 {'desc': desc, 'ext': ext, 'id': format_id, 'is_video': is_video, 'is_default': False,
-                 'height': height})
+                 'height': height, 'filesize': filesize})
 
         highest_res_no_combine_height = 0
         highest_res_no_combine_id = 0
         for f in return_json['formats']:
             if f['is_video']:
-                if f['height'] > highest_res_no_combine_height:
+                if f['height'] > highest_res_no_combine_height and "+" not in f['id']:
                     highest_res_no_combine_height = f['height']
                     highest_res_no_combine_id = f['id']
 
         # search for that id
+        for idx, f in enumerate(return_json['formats']):
+            if f['id'] == highest_res_no_combine_id:
+                return_json['formats'][idx]['is_default'] = True
+
         return return_json
