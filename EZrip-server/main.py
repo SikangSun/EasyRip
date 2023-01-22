@@ -34,17 +34,20 @@ async def fake_video_streamer():
 
 def video_streamer(v, f):
     if f == 0:
-        proc = subprocess.Popen(["./yt-dlp", "-o", "-", "https://www.youtube.com/watch?v=" + v],
+        proc = subprocess.Popen(["./yt-dlp_macos", "-o", "-", "https://www.youtube.com/watch?v=" + v],
                                 stdout=subprocess.PIPE)
     else:
-        proc = subprocess.Popen(["./yt-dlp", "-o", "-", "-f", str(f), "https://www.youtube.com/watch?v=" + v],
+        print(f)
+        f = f.replace(" ", "+")
+        proc = subprocess.Popen(["./yt-dlp_macos", "-o", "-", "-f", str(f), "--ffmpeg-location", ".",
+                                 "https://www.youtube.com/watch?v=" + v],
                                 stdout=subprocess.PIPE)
 
     return proc.stdout
 
 
 @app.get("/get_video")
-async def get_video(v, f: int = 0):
+async def get_video(v, f):
     return StreamingResponse(video_streamer(v, f), media_type="application/octet-stream")
 
 
@@ -91,6 +94,17 @@ async def get_video_metadata(v):
             desc = f['format'][f['format'].index(' ', i + 1) + 1:]
             ext = f['ext']
 
-            return_json['formats'].append({'desc': desc, 'ext': ext, 'id': format_id, 'is_video': is_video})
+            return_json['formats'].append(
+                {'desc': desc, 'ext': ext, 'id': format_id, 'is_video': is_video, 'is_default': False,
+                 'height': height})
 
+        highest_res_no_combine_height = 0
+        highest_res_no_combine_id = 0
+        for f in return_json['formats']:
+            if f['is_video']:
+                if f['height'] > highest_res_no_combine_height:
+                    highest_res_no_combine_height = f['height']
+                    highest_res_no_combine_id = f['id']
+
+        # search for that id
         return return_json
