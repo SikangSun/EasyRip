@@ -23,7 +23,7 @@
     let audioList = ["1","asdfasfasdfsadf","3","4","5"];
     let defaultAudioID = ""
 
-    let server = "http://127.0.0.1:8000/"
+    let server = "http://142.93.126.82:8080/"
 
 
     let sponsor = false;
@@ -170,14 +170,17 @@
             
             <!-- download audio -->
             <div class="relative flex flex-col justify-start mr-2">
-                <a href={`${server}get_video?v=${videoID}&f=${defaultAudioID}${filename ? `&n=${filename}` : ""}`} class="btn">
-                    <div class="inline-block">
-                        Download Audio
-                        <button on:click="{() => showAudioList = !showAudioList}" class="btn p-1 pl-2 pr-2">{#if showAudioList == true} ↑ {:else} ↓ {/if}</button>
-                    </div>
-                </a>
+                <div>
+                    <a href={`${server}get_video?v=${videoID}&f=${defaultAudioID}${filename ? `&n=${filename}` : ""}`} class="btn">
+                        <div class="inline-block">
+                            Download Audio
+                        
+                        </div>
+                    </a>
+                    <button on:click="{() => showAudioList = !showAudioList}" class="btn p-1 pl-2 pr-2">{#if showAudioList == true} ↑ {:else} ↓ {/if}</button>
+                </div>
                 {#if showAudioList == true}
-                    <div  transition:fly="{{x:-200, duration: 500}}" class="absolute w-fit max-w-[300px] h-fit top-12 outline outline-gray-500 bg-slate-50 rounded-sm pr-0">
+                    <div  transition:fly="{{x:-200, duration: 500}}" class="absolute w-fit max-w-[300px] h-fit top-10 outline outline-gray-500 bg-slate-50 rounded-sm pr-0">
                         {#each audioList as audio}
                             <div class="text-xs hover:bg-slate-200">
                                 <a href={`${server}get_video?v=${videoID}&f=${audio.id}${filename ? `&n=${filename}` : ""}`}>
@@ -195,15 +198,18 @@
 
             <!-- download video -->
             <div class="relative flex flex-col justify-start">
+                <div>
                 <a href={`${server}get_video?v=${videoID}&f=${defaultVideoID}${filename ? `&n=${filename}` : ""}`} class="btn">
                     <div class="inline-block">
                         Download Video
-                        <button on:click="{() => showVideoList = !showVideoList}" class="btn p-1 pl-2 pr-2"> {#if showVideoList == true} ↑ {:else} ↓ {/if}</button>
+                       
                     </div>
                 </a>
+                <button on:click="{() => showVideoList = !showVideoList}" class="btn p-1 pl-2 pr-2"> {#if showVideoList == true} ↑ {:else} ↓ {/if}</button>
+            </div>
             {#if showVideoList == true}
 
-                <div transition:fly="{{x:200, duration: 500}}" class="absolute w-fit max-w-[300px] h-fit top-12 outline outline-gray-500 bg-slate-50 rounded-sm pr-0">
+                <div transition:fly="{{x:200, duration: 500}}" class="absolute w-fit max-w-[300px] h-fit top-10 outline outline-gray-500 bg-slate-50 rounded-sm pr-0">
                     {#each videoList as video}
                         <div  class="text-xs hover:bg-slate-200">
                             <a href={`${server}get_video?v=${videoID}&f=${video.id}${filename ? `&n=${filename}` : ""}`}>
