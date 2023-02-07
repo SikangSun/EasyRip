@@ -23,7 +23,7 @@
     let audioList = ["1","asdfasfasdfsadf","3","4","5"];
     let defaultAudioID = ""
 
-    let server = "https://780ijn.deta.dev/"
+    let server = "https://5dj0fi.deta.dev/"
 
 
     let sponsor = false;
