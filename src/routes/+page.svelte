@@ -23,7 +23,7 @@
     let audioList = ["1","asdfasfasdfsadf","3","4","5"];
     let defaultAudioID = ""
 
-    let server = "http://142.93.126.82:8080/"
+    let server = "https://780ijn.deta.dev/"
 
 
     let sponsor = false;
